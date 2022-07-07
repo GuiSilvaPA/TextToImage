@@ -72,6 +72,10 @@ class GaussianDiffusion(nn.Module):
         alpha, sigma           = self.snr_to_alpha_sigma(log_snr)
         alpha_next, sigma_next = self.snr_to_alpha_sigma(log_snr_next)
 
+        alpha, sigma           = alpha.to(self.device), sigma.to(self.device)
+        alpha_next, sigma_next = alpha_next.to(self.device), sigma_next.to(self.device)
+        log_snr, log_snr_next  = log_snr.to(self.device), log_snr_next.to(self.device)
+
         c      = 1 - torch.exp(log_snr - log_snr_next)
         p_mean = alpha_next * (x_t * (1 - c) / alpha + c * x_start)
 
