@@ -219,12 +219,12 @@ class Imagen(nn.Module):
                                                                  lowres_noise_times = lowres_noise_times, noise_scheduler = noise_scheduler,
                                                                  pred_objective = pred_objective, dynamic_threshold = dynamic_threshold)
         
-        noise = torch.randn_like(x)
+        noise = torch.randn_like(x, device=device)
 
         is_last_sampling_timestep = (t_next == 0) if isinstance(noise_scheduler, GaussianDiffusion) else (t == 0)
         nonzero_mask = (1 - is_last_sampling_timestep.float()).reshape(b, *((1,) * (len(x.shape) - 1)))
         
-        return model_mean + nonzero_mask * (0.5 * model_log_variance).exp() * noise
+        return model_mean + nonzero_mask.to(device) * (0.5 * model_log_variance).exp() * noise
     
     @torch.no_grad()
     def p_sample_loop(self, unet, shape, text_embeds = None, text_mask = None, cond_images = None,
