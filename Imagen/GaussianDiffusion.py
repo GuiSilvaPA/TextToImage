@@ -94,11 +94,18 @@ class GaussianDiffusion(nn.Module):
     
     def predict_start_from_noise(self, x_t, t, noise):
         
-        x_t = x_t.to(self.device)
+        x_t   = x_t.to(self.device)
+        noise = noise.to(self.device)
 
         snr = self.snr_func(t)
         
         snr          = t_equal_x_dim(x_t, snr)
         alpha, sigma = self.snr_to_alpha_sigma(snr)
+
+        alpha = alpha.to(self.device)
+        sigma = sigma.to(self.device)
+
+        num = (x_t - sigma * noise)
+        dem = alpha.clamp(min = 1e-8)
         
-        return (x_t - sigma * noise) / alpha.clamp(min = 1e-8)
+        return  num/ dem
