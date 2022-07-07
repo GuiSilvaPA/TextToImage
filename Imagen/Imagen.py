@@ -13,7 +13,7 @@ from einops import rearrange, repeat, reduce
 
 from typing import List
 
-from tqdm import tqdm
+from tqdm.notebook import tqdm
 
 import torchvision.transforms as T
 
