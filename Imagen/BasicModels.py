@@ -56,7 +56,7 @@ class SinusoidalPositionEmbedding(nn.Module):
     def forward(self, x):
         
         x = x[:, None]
-        f = x * self.weights[None, :]
+        f = x * self.weights[None, :].to(x.device)
         w = f * 2 * torch.pi
         
         return torch.cat((x, torch.sin(w), torch.cos(w)), dim = -1)
