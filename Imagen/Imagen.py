@@ -157,7 +157,7 @@ class Imagen(nn.Module):
 
     @contextmanager
     def one_unet_in_gpu(self, unet_number = None, unet = None):
-        assert unet_number is not None ^ unet is not None
+        assert (unet_number is not None) ^ (unet is not None)
 
         if unet_number is not None:
             unet = self.get_unet(unet_number)
