@@ -61,6 +61,9 @@ class GaussianDiffusion(nn.Module):
 
     def q_posterior(self, x_start, x_t, t, t_next):
 
+        x_start = x_start.to(self.device)
+        t_next  = t_next.to(self.device)
+
         log_snr      = self.snr_func(t)
         log_snr_next = self.snr_func(t_next)
 
@@ -78,6 +81,9 @@ class GaussianDiffusion(nn.Module):
         return p_mean, p_variance, p_log_variance
     
     def q_sample(self, x_start, t, noise):
+
+        x_start = x_start.to(self.device)
+        noise   = noise.to(self.device)
         
         snr = self.snr_func(t)
         
@@ -88,6 +94,8 @@ class GaussianDiffusion(nn.Module):
     
     def predict_start_from_noise(self, x_t, t, noise):
         
+        x_t = x_t.to(self.device)
+
         snr = self.snr_func(t)
         
         snr          = t_equal_x_dim(x_t, snr)
