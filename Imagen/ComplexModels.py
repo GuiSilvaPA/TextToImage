@@ -108,7 +108,8 @@ class UNet(nn.Module):
                  cond_dim = None, num_time_tokens = 2, learned_sinu_pos_emb_dim = 16, dim_mults=(1, 2, 4, 8),
                  channels = 3, att_dim_head = 64, att_heads = 8, ff_mult = 2, lowres_cond = False, 
                  layer_attns = True, layer_cross_attns = True, max_text_len = 256, resnet_groups = 8,
-                 init_cross_embed_kernel_sizes = (3, 7, 15), att_pool_num_latents = 32, use_global_context_attn = True):
+                 init_cross_embed_kernel_sizes = (3, 7, 15), att_pool_num_latents = 32,
+                 use_global_context_attn = True, device='cpu'):
 
         self.lowres_cond = lowres_cond
 
@@ -127,7 +128,7 @@ class UNet(nn.Module):
                                           num_latents    = att_pool_num_latents,
                                           max_text_len   = max_text_len,
                                           Ttype          = torch.float,
-                                          device         = 'cpu')
+                                          device         = device)
         
         self.norm_cond = nn.LayerNorm(cond_dim)
         

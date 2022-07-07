@@ -83,6 +83,7 @@ class Imagen(nn.Module):
         p2_loss_weight_k = 1,
         dynamic_thresholding = True,
         dynamic_thresholding_percentile = 0.9,      # unsure what this was based on perusal of paper
+        device='cpu'
     ):
         super(Imagen, self).__init__()
         
@@ -107,7 +108,7 @@ class Imagen(nn.Module):
         mults           = n_unets - len(noise_schedules) if n_unets - len(noise_schedules) > 0 else 0
         noise_schedules = (*noise_schedules, *('linear',)*mults)
 
-        self.lowres_noise_schedule = GaussianDiffusion(noise_type=lowres_noise_schedule)
+        self.lowres_noise_schedule = GaussianDiffusion(noise_type=lowres_noise_schedule, device=device)
         self.pred_objectives       = (pred_objectives,)*n_unets
 
         self.text_encoder_name = text_encoder_name
@@ -116,7 +117,7 @@ class Imagen(nn.Module):
 
         self.noise_schedulers = nn.ModuleList([])
         for timestep, noise_schedule in zip(timesteps, noise_schedules):
-            noise_scheduler = GaussianDiffusion(noise_type=noise_schedule, timesteps=timestep)
+            noise_scheduler = GaussianDiffusion(noise_type=noise_schedule, timesteps=timestep, device=device)
             self.noise_schedulers.append(noise_scheduler)
             
         self.unets = nn.ModuleList([])        
