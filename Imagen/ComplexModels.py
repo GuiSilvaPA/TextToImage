@@ -111,6 +111,8 @@ class UNet(nn.Module):
                  init_cross_embed_kernel_sizes = (3, 7, 15), att_pool_num_latents = 32,
                  use_global_context_attn = True, device='cpu'):
 
+        self.device = device
+
         self.lowres_cond = lowres_cond
 
         super(UNet, self).__init__()
@@ -266,7 +268,12 @@ class UNet(nn.Module):
     def forward(self, x, time, text_embeds, text_mask,
                 cond_images=None, lowres_cond_img = None, lowres_noise_times = None, cond_drop_prob = 0.):
         
-        
+        x           = x.to(self.device)
+        time        = time.to(self.device)
+        text_embeds = text_embeds.to(self.device)
+        text_mask   = text_mask.to(self.device)
+
+
         # Time Conditioning        
         time_tokens, t = self.time_cond(time)
 
