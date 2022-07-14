@@ -119,7 +119,7 @@ class ImagenTrainer(nn.Module):
 
             for images, texts in tqdm(train_data):
 
-                images = images.to(self.device)
+                images = images.float().to(self.device)
 
                 self.optimizer.zero_grad()
 
