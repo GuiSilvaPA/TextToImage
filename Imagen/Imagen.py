@@ -13,8 +13,11 @@ from einops import rearrange, repeat, reduce
 
 from typing import List
 
-# from tqdm.notebook import tqdm
-from tqdm import tqdm
+from tqdm.notebook import tqdm
+
+from Utils import CustomDataset, ImagenTrainer
+
+# from tqdm import tqdm
 
 import torchvision.transforms as T
 
