@@ -15,8 +15,6 @@ from typing import List
 
 from tqdm.notebook import tqdm
 
-from ImagensTools import teste
-
 # from tqdm import tqdm
 
 import torchvision.transforms as T
