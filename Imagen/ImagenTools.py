@@ -117,6 +117,8 @@ class ImagenTrainer(nn.Module):
 
             total_loss = 0.
 
+            print(f'\n================================ EPOCH {epoch} ================================\n')
+
             for images, texts in tqdm(train_data):
 
                 images = images.float().to(self.device)
@@ -146,7 +148,7 @@ class ImagenTrainer(nn.Module):
                 else:
                     self.save(inter_path)
 
-            print(f'Epoch: {epoch} | Train Loss: {total_train_loss} | Valid Loss: {total_valid_loss}')
+            print(f'\nEpoch: {epoch} | Train Loss: {total_train_loss} | Valid Loss: {total_valid_loss}')
 
         plt.plot(train_loss_per_epoch, label="Training")
         plt.plot(valid_loss_per_epoch, label="Validating")
