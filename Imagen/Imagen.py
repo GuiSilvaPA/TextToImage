@@ -15,7 +15,7 @@ from typing import List
 
 from tqdm.notebook import tqdm
 
-from Utils import CustomDataset, ImagenTrainer
+from ImagensTools import teste
 
 # from tqdm import tqdm
 
