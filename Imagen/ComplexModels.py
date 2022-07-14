@@ -136,6 +136,9 @@ class UNet(nn.Module):
         
         self.init_conv = BM.CrossEmbedding(channels, dim, stride=1, kernel_sizes=init_cross_embed_kernel_sizes)
         
+        self.init_resnet_block = BM.ResnetLayer(dim, dim, cond_dim=None, time_cond_dim=dim*4,
+                                                groups=resnet_groups, linear_att=False, gca=use_global_context_attn)
+
         # Params for UNet
         
         dims   = [dim, *[m*dim for m in dim_mults]]
@@ -163,10 +166,14 @@ class UNet(nn.Module):
             
             is_last = i >= (len(in_out) - 1)
             
-            layer_cond_dim = cond_dim if layer_cross_attn else None            
-            current_dim    = dim_in
-            
-            skip_connect_dims.append(current_dim)           
+            layer_cond_dim = cond_dim if layer_cross_attn else None                       
+
+
+            # Downsample for memory efficiency
+            downsample  = nn.Conv2d(dim_in, dim_out, 4, 2, 1)   
+            current_dim = dim_out
+
+            skip_connect_dims.append(current_dim) 
              
             # First Resnet
             init_resnet = BM.ResnetLayer(current_dim, current_dim, cond_dim=layer_cond_dim,
@@ -183,14 +190,8 @@ class UNet(nn.Module):
             else: 
                 transformerLayer = BM.Identity()
                 
-            # Downsample
-            if not is_last: 
-                downsample = nn.Conv2d(current_dim, dim_out, 4, 2, 1)
-            else:
-                downsample = BM.Parallel(nn.Conv2d(dim_in, dim_out, 3, padding = 1), nn.Conv2d(dim_in, dim_out, 1))
-                
             # Append self.downs for Encoder
-            self.downs.append(nn.ModuleList([init_resnet, mult_resnet, transformerLayer, downsample]))
+            self.downs.append(nn.ModuleList([downsample, init_resnet, mult_resnet, transformerLayer]))
             
         # UNet Bottleneck =======================================================================================================================
         
@@ -203,8 +204,6 @@ class UNet(nn.Module):
         # UNet Decoder ==========================================================================================================================
             
         for i, ((dim_in, dim_out), resnet_n, groups, layer_attn, layer_cross_attn) in enumerate(zip(*r_params)):
-            
-            is_last = i == (len(in_out) - 1)
             
             layer_cond_dim = cond_dim if layer_cross_attn else None          
             
@@ -225,11 +224,8 @@ class UNet(nn.Module):
                 transformerLayer = BM.Identity()
                 
             # Upsample
-            if not is_last: 
-                upsample = nn.Sequential(nn.Upsample(scale_factor=2, mode='nearest'),
-                                         nn.Conv2d(dim_out, dim_in, 3, padding=1))
-            else:
-                upsample = BM.Identity()               
+            upsample = nn.Sequential(nn.Upsample(scale_factor=2, mode='nearest'),
+                                     nn.Conv2d(dim_out, dim_in, 3, padding=1))           
 
             # Append self.ups for Decoder
             self.ups.append(nn.ModuleList([init_resnet, mult_resnet, transformerLayer, upsample]))
@@ -290,11 +286,14 @@ class UNet(nn.Module):
         # Processing Image
         
         x = self.init_conv(x)
-        
+        x = self.init_resnet_block(x, time_emb=t)
         # Encoder
         
         hiddens = []
-        for init_resnet, mult_resnet, transformerLayer, downsample in self.downs:
+        for downsample, init_resnet, mult_resnet, transformerLayer in self.downs:
+
+            x = downsample(x)
+            
             x = init_resnet(x, t, c)
 
             for resnet in mult_resnet:
@@ -303,8 +302,6 @@ class UNet(nn.Module):
                 
             x = transformerLayer(x, c)
             hiddens.append(x)
-
-            x = downsample(x)
             
         x = self.mid_block1(x, t, c)
         
