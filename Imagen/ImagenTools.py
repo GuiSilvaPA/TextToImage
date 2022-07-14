@@ -100,7 +100,7 @@ class ImagenTrainer(nn.Module):
 
         for images, texts in tqdm(data):
 
-                images = images.to(self.device)
+                images = images.float().to(self.device)
 
                 loss = self.imagen(images, texts=texts, unet_number = 0, device=self.device)
 
