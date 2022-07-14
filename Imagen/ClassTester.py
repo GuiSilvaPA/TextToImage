@@ -82,3 +82,8 @@ images = img.sample(texts = ['a whale breaching from afar',
 
 print(images.shape) # (3, 3, 256, 256)
 
+with torch.no_grad():
+        texts = ['I love you so much', 'I love you so much', 'I love you so much', 'I love you so much']
+        loss = img(x, texts=texts, unet_number = 0, device='cpu')
+        print(loss)
+
