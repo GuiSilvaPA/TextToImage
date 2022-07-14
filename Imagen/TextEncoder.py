@@ -36,3 +36,5 @@ if __name__=='__main__':
     print(T5.textEncoder(['I', 'you', 'yes my'])[0])
     print()
     print(T5.textEncoder(['I', 'you', 'yes my'])[1])
+
+    print('Dimension:', T5.embed_dim)
