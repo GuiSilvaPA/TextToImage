@@ -20,7 +20,7 @@ In the next image, some outputs of Imagen are showed.
 Use this command to clone the repository for use in Google Colab
 
 ```bash
-! git clone https://github.com/GuiSilvaPA/TextToImage.git
+!git clone https://github.com/GuiSilvaPA/TextToImage.git
 
 import sys
 sys.path.insert(0,'/content/TextToImage/Imagen')
@@ -28,60 +28,55 @@ sys.path.insert(0,'/content/TextToImage/Imagen')
 
 ## Usage
 
+### UNet
+
 ```python
-import torch
-from imagen_pytorch import Unet, Imagen
+from ComplexModels import UNet
 
-# unet for imagen
+# dim: number base for channels in each convolutional layer
+# dim_mults: multplier for each concolutional layer
+# text_embed_dim: size o mebdding dimension (512 for small T5)
 
-unet1 = Unet(
-    dim = 32,
-    cond_dim = 512,
-    dim_mults = (1, 2, 4, 8),
-    num_resnet_blocks = 3,
-    layer_attns = (False, True, True, True),
-    layer_cross_attns = (False, True, True, True)
-)
+unet1 = UNet(dim = 64, cond_dim = 512, text_embed_dim = 512,
+             dim_mults = (1, 2, 4, 8), num_resnet_blocks = 3,
+             layer_attns = (False, True, True, True),
+             layer_cross_attns = (False, True, True, True),
+             device=device).to(device)
 
-unet2 = Unet(
-    dim = 32,
-    cond_dim = 512,
-    dim_mults = (1, 2, 4, 8),
-    num_resnet_blocks = (2, 4, 8, 8),
-    layer_attns = (False, False, False, True),
-    layer_cross_attns = (False, False, False, True)
-)
+```
 
-# imagen, which contains the unets above (base unet and super resoluting ones)
+### Imagen
+```python
 
-imagen = Imagen(
-    unets = (unet1, unet2),
-    image_sizes = (64, 256),
-    timesteps = 1000,
-    cond_drop_prob = 0.1
-).cuda()
+# image_sizes: size o square image in output
+# timesteps: number of timesteps in noise addition
+# text_encoder_name: encoder for text
 
-# mock images (get a lot of this) and text encodings from large T5
+imgen_model = Imagen((unet1,), image_sizes=(64,), timesteps=4000,
+                      text_encoder_name = 'google/t5-v1_1-small',
+                      cond_drop_prob = 0.3, device=device)
+```
 
-text_embeds = torch.randn(4, 256, 768).cuda()
-images = torch.randn(4, 3, 256, 256).cuda()
+### Example of training and image generation
+```python
 
-# feed images into imagen, training each unet in the cascade
+images = torch.randn(4, 3, 64, 64)
+texts  = ['A woman is working in a kitchen carrying a soft toy.',
+          'A truck carries a large amount of items and a few people.',
+          'A boat full of people is on a trailer with wheels.',
+          'A pigeon greets three bicyclists on a park path']
 
-for i in (1, 2):
-    loss = imagen(images, text_embeds = text_embeds, unet_number = i)
-    loss.backward()
+# feed images into imagen, compute the loss and train
 
-# do the above for many many many many steps
-# now you can sample an image based on the text embeddings from the cascading ddpm
+loss = img(images, texts=texts)
+loss.backward()
 
-images = imagen.sample(texts = [
-    'a whale breaching from afar',
-    'young girl blowing out candles on her birthday cake',
-    'fireworks with blue and green sparkles'
-], cond_scale = 3.)
+# for image generation
 
-images.shape # (3, 3, 256, 256)
+images = imagen.sample(texts = ['a whale breaching from afar',
+                                'fireworks with blue and green sparkles'], cond_scale = 3.)
+
+# the images will have the shape: (2, 3, 64, 64)
 ```
 
 For simpler training, you can directly supply text strings instead of precomputing text encodings. (Although for scaling purposes, you will definitely want to precompute the textual embeddings + mask)
