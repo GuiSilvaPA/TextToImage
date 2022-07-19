@@ -11,6 +11,10 @@ import json, h5py, random
 from pathlib import Path
 from tqdm.notebook import tqdm
 
+import numpy as np
+from scipy.linalg import sqrtm
+from torchvision.models import resnet50, ResNet50_Weights
+
 # =============================================================================================
 # === COLLATE ANY FUNCTION ====================================================================
 # =============================================================================================
@@ -102,7 +106,7 @@ class ImagenTrainer(nn.Module):
 
                 images = images.float().to(self.device)
 
-                loss = self.imagen(images, texts=texts, unet_number = 0, device=self.device)
+                loss = self.imagen(images, texts=texts, device=self.device)
 
                 total_loss += loss.item()
 
@@ -159,6 +163,34 @@ class ImagenTrainer(nn.Module):
 # === FID METRIC ==============================================================================
 # =============================================================================================
 
+class Identity(nn.Module):
+    def __init__(self):
+        super(Identity, self).__init__()
+        
+    def forward(self, x):
+        return x
+
+def FID(image, target_image, device='cpu'):
+    
+    # Based on: https://arxiv.org/pdf/1706.08500.pdf
+    # FID = ||Mr - Mg||^2 + Trace(COVr + COVg + 2*(COVr*COVg)**(1/2))
+
+    model    = resnet50(weights=ResNet50_Weights.IMAGENET1K_V1)
+    model.fc = Identity()
+
+    model = model.to(device)
+
+    IMGg = model(image).detach().numpy()
+    IMGr = model(target_image).detach().numpy() 
+        
+    Mg, COVg = IMGg.mean(axis=0), np.cov(IMGg, rowvar=False)
+    Mr, COVr = IMGr.mean(axis=0), np.cov(IMGr, rowvar=False)
+    
+    covmean = sqrtm(COVg.dot(COVr))    
+    
+    if np.iscomplexobj(covmean): covmean = covmean.real
+
+    return np.sum((Mr - Mg)**2.0) + np.trace(COVg + COVr - 2.0 * covmean)
 
 if __name__ == '__main__':
 
