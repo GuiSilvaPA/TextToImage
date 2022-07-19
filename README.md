@@ -133,7 +133,7 @@ images_out, imgs, texts = get_images(trainer, test_loader, num_imgs=50)
 
 ```
 
-### FID - Fréchet Inception Distance
+### Evaluation with FID
 
 * Formulation
     * $\mathbf{FID} = ||\mu_r - \mu_g||^2 + Tr(\Sigma_{r} + \Sigma_{g} - 2(\Sigma_r \Sigma_g)^{1/2})​$
@@ -148,7 +148,7 @@ images_out, imgs, texts = get_images(trainer, test_loader, num_imgs=50)
 ```python
 from ImagenTools import FID
 
-# Is the metric used to evaluate the generated images, based com a comparison with a reference image
+# It is the metric used to evaluate the generated images, based on the comparison with a reference image.
 
 fid = FID(images_out.cpu(),           # Generated Image
           torch.stack(imgs).float())  # Reference Image
