@@ -3,7 +3,7 @@
 This work is based on Imagen, a Text to Image generator. The main difference between this implementation and the original is the UNets cascade, which is not present in this work. The template created here is similar to the image below
 
 <p align="center">
-    <img src="./imagen.png" width="500px"></img>
+    <img src="./imagen_net.png" width="500px"></img>
 </p>
 
 The implementation of the original image is presented in <a href="https://gweb-research-imagen.appspot.com/">Imagen</a>. the architecture of Imagen is simpler than Google's DALL-E2, but better. It is the new SOTA for text-to-image synthesis.
