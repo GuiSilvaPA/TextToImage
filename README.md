@@ -26,7 +26,7 @@ import sys
 sys.path.insert(0,'/content/TextToImage/Imagen')
 ```
 
-## Usage
+## Simple Usage
 
 ### UNet
 
@@ -47,12 +47,13 @@ unet1 = UNet(dim = 64, cond_dim = 512, text_embed_dim = 512,
 
 ### Imagen
 ```python
+from Imagen import Imagen
 
 # image_sizes: size o square image in output
 # timesteps: number of timesteps in noise addition
 # text_encoder_name: encoder for text
 
-imgen_model = Imagen((unet1,), image_sizes=(64,), timesteps=4000,
+imagen_model = Imagen((unet1,), image_sizes=(64,), timesteps=4000,
                       text_encoder_name = 'google/t5-v1_1-small',
                       cond_drop_prob = 0.3, device=device)
 ```
@@ -73,34 +74,35 @@ loss.backward()
 
 # for image generation
 
-images = imagen.sample(texts = ['a whale breaching from afar',
-                                'fireworks with blue and green sparkles'], cond_scale = 3.)
+images = imagen_model.sample(texts = ['a whale breaching from afar',
+                                      'fireworks with blue and green sparkles'], cond_scale = 3.)
 
 # the images will have the shape: (2, 3, 64, 64)
 ```
 
-For simpler training, you can directly supply text strings instead of precomputing text encodings. (Although for scaling purposes, you will definitely want to precompute the textual embeddings + mask)
+## Tools for dataset, training, visualization and evaluation
 
-The number of textual captions must match the batch size of the images if you go this route.
+Here, some tools are presented to help the dataset and dataloader creation, the training, the visualization and the evaluation
+
+### CustomDataset and DataLoader
 
 ```python
-# mock images and text (get a lot of this)
+from ImagenTools import CustomDataset, collate_any
+from torch.utils.data import DataLoader
 
-texts = [
-    'a child screaming at finding a worm within a half-eaten apple',
-    'lizard running across the desert on two feet',
-    'waking up to a psychedelic landscape',
-    'seashells sparkling in the shallow waters'
-]
+train_set = CustomDataset("./TRAIN_IMAGES_coco_5_cap_per_img.hdf5",   # The path for images
+                          "./TRAIN_CAPTIONS_coco_5_cap_per_img.json", # The path for captions
+                          image_size=64)                              # Resize of the input image
 
-images = torch.randn(4, 3, 256, 256).cuda()
+train_loader = DataLoader(train_set, batch_size=4, collate_fn=collate_any)
 
-# feed images into imagen, training each unet in the cascade
-
-for i in (1, 2):
-    loss = imagen(images, texts = texts, unet_number = i)
-    loss.backward()
+# Using the next command can show, for example, the images below
+imgs, texts = next(iter(train_loader))
 ```
+
+<p align="center">
+    <img src="./imagens_dataset.png" width="500px"></img>
+</p>
 
 With the `ImagenTrainer` wrapper class, the exponential moving averages for all of the U-nets in the cascading DDPM will be automatically taken care of when calling `update`
 
