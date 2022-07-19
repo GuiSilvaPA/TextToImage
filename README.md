@@ -104,7 +104,7 @@ imgs, texts = next(iter(train_loader))
     <img src="./imagens_dataset.png" width="500px"></img>
 </p>
 
-
+### Training
 
 ```python
 from ImagenTools import ImagenTrainer
