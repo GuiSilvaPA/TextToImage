@@ -125,7 +125,7 @@ class ImagenTrainer(nn.Module):
 
                 self.optimizer.zero_grad()
 
-                loss = self.imagen(images, texts=texts, unet_number = 0, device=self.device)
+                loss = self.imagen(images, texts=texts, device=self.device)
                 loss.backward()
                 self.optimizer.step()
 
@@ -154,6 +154,10 @@ class ImagenTrainer(nn.Module):
         plt.plot(valid_loss_per_epoch, label="Validating")
         plt.title('Loss x Epoch')
         plt.show()
+
+# =============================================================================================
+# === FID METRIC ==============================================================================
+# =============================================================================================
 
 
 if __name__ == '__main__':
