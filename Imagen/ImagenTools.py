@@ -192,6 +192,42 @@ def FID(image, target_image, device='cpu'):
 
     return np.sum((Mr - Mg)**2.0) + np.trace(COVg + COVr - 2.0 * covmean)
 
+# =============================================================================================
+# === GET SEQUENCE OF IMAGES ==================================================================
+# =============================================================================================
+
+def get_images(trainer, loader):
+
+    imgs, texts = [], []
+
+    for m, (i, t) in enumerate(loader):
+        imgs.append(i[0])
+        texts.append(t[0])
+        if m+1 == 50: break
+
+    images_out = trainer.sample(texts=texts, cond_scale = 3.)
+
+    for img, im, text in zip(images_out.cpu(), imgs, texts):
+
+        img = img.cpu()
+        fig = plt.figure(figsize=(10, 5))
+
+        fig.add_subplot(1, 2, 1)
+        plt.imshow((img.numpy().transpose(1, 2, 0)+1)/2)
+        plt.title('Generated Image')
+        plt.axis('off')
+
+        fig.add_subplot(1, 2, 2)
+        plt.imshow((im.numpy().transpose(1, 2, 0)+1)/2)
+        plt.title('Reference Image')
+        plt.axis('off')
+
+        fig.suptitle(text)
+
+        plt.show()
+
+        print('\n=========================================================================== \n')
+
 if __name__ == '__main__':
 
     pass
