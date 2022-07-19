@@ -228,6 +228,8 @@ def get_images(trainer, loader):
 
         print('\n=========================================================================== \n')
 
+    return images_out, imgs, texts
+
 if __name__ == '__main__':
 
     pass
