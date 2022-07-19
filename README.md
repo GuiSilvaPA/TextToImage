@@ -2,7 +2,14 @@
 
 <a href="https://colab.research.google.com/drive/1CXsdGN7JuN-JZ9nvq6_fbkealSJ3dQuN?usp=sharing">Test with Small MS COCO and image size of 128x128</a>
 
-p
+<a href="https://colab.research.google.com/drive/1_0dDEMMmzBDhrMpughXUP58JBh8Yp4I8?usp=sharing">Test with Small MS COCO and image size of 96x96</a>
+
+<a href="https://colab.research.google.com/drive/1r_G1TV0T0TPiRh-o9l4wipZS78fkGyxT?usp=sharing">Test with Small MS COCO and image size of 64x64</a>
+
+<a href="https://colab.research.google.com/drive/1Nu_qoCrCH9jnHoQxvP5FA-9ddGt2agBf?usp=sharing">Test with Fashion MNIST and image size of 18x18</a>
+
+<a href=" ">Overfitting with Small MS COCO and image size of 64x64</a>
+
 
 ## Imagen - Pytorch
 
