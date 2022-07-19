@@ -13,8 +13,8 @@ from einops import rearrange, repeat, reduce
 
 from typing import List
 
-# from tqdm.notebook import tqdm
-from tqdm import tqdm
+from tqdm.notebook import tqdm
+# from tqdm import tqdm
 
 import torchvision.transforms as T
 
@@ -59,6 +59,12 @@ def eval_decorator(fn):
         model.train(was_training)
         return out
     return inner
+
+# ===============================================================================================================================
+# ===============================================================================================================================
+# ===================== IMAGEN ==================================================================================================
+# ===============================================================================================================================
+# ===============================================================================================================================
 
 class Imagen(nn.Module):
     def __init__(self, unet, image_sizes, text_encoder_name = 'google/t5-v1_1-small', channels = 3, timesteps = 1000,
@@ -179,8 +185,8 @@ class Imagen(nn.Module):
                     cond_scale = 1, lowres_cond_img = None, lowres_noise_times = None,
                     noise_scheduler=None, pred_objective = 'noise'):
         
-        device, batch = self.device, shape[0],
-        img           = torch.randn(shape, device = device)
+        device, batch      = self.device, shape[0],
+        img                = torch.randn(shape, device = device)
         lowres_cond_img    = lowres_cond_img if lowres_cond_img is None else self.normalize_img(lowres_cond_img)
         timesteps          = noise_scheduler.get_sampling_timesteps(batch)
 
