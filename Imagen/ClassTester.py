@@ -42,7 +42,7 @@ print(x.shape) """
 unet1 = UNet(dim = 8, cond_dim = 40, text_embed_dim = 512, dim_mults = (1, 2, 4, 8), num_resnet_blocks = 3,
              layer_attns = (False, True, True, True), layer_cross_attns = (False, True, True, True))
 
-img = Imagen((unet1,),
+'''img = Imagen((unet1,),
         image_sizes=(32,),                             
         text_encoder_name = 'google/t5-v1_1-small',
         text_embed_dim = None,
@@ -61,7 +61,12 @@ img = Imagen((unet1,),
         p2_loss_weight_gamma = 0.5,              
         p2_loss_weight_k = 1,
         dynamic_thresholding = True,
-        dynamic_thresholding_percentile = 0.9)
+        dynamic_thresholding_percentile = 0.9)'''
+
+img = Imagen((unet1,), (32,), text_encoder_name = 'google/t5-v1_1-small', channels = 3, timesteps = 10,
+             cond_drop_prob = 0.1, noise_schedules = 'cosine', pred_objectives = 'noise', lowres_noise_schedule = 'linear',
+             lowres_sample_noise_level = 0.2, per_sample_random_aug_noise_level = False,  p2_loss_weight_gamma = 0.5,
+             p2_loss_weight_k = 1, dynamic_thresholding = True, dynamic_thresholding_percentile = 0.9, device='cpu')
 
 print('\n ============ VARIAVEIS ============ ')
 
@@ -73,7 +78,7 @@ print('\n ============== SAIDA ============== \n')
 
 # loss = img(x, text_embeds = text_embeds, text_masks = text_masks, unet_number = 0)
 texts = ['I love you so much', 'I love you so much', 'I love you so much', 'I love you so much']
-loss = img(x, texts=texts, unet_number = 0, device='cpu')
+loss = img(x, texts=texts, device='cpu')
 print(loss)
 
 images = img.sample(texts = ['a whale breaching from afar',
@@ -84,6 +89,6 @@ print(images.shape) # (3, 3, 256, 256)
 
 with torch.no_grad():
         texts = ['I love you so much', 'I love you so much', 'I love you so much', 'I love you so much']
-        loss = img(x, texts=texts, unet_number = 0, device='cpu')
+        loss = img(x, texts=texts, device='cpu')
         print(loss)
 
