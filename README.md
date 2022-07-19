@@ -1,45 +1,24 @@
-<img src="./imagen.png" width="450px"></img>
-
 ## Imagen - Pytorch
 
-Implementation of <a href="https://gweb-research-imagen.appspot.com/">Imagen</a>, Google's Text-to-Image Neural Network that beats DALL-E2, in Pytorch. It is the new SOTA for text-to-image synthesis.
+This work is based on Imagen, a Text to Image generator. The main difference between this implementation and the original is the UNets cascade, which is not present in this work. The template created here is similar to the image below
 
-Architecturally, it is actually much simpler than DALL-E2. It consists of a cascading DDPM conditioned on text embeddings from a large pretrained T5 model (attention network). It also contains dynamic clipping for improved classifier free guidance, noise level conditioning, and a memory efficient unet design.
+<img src="./imagen.png" width="450px"></img>
 
-It appears neither CLIP nor prior network is needed after all. And so research continues.
+The implementation of the original image is presented in <a href="https://gweb-research-imagen.appspot.com/">Imagen</a>. the architecture of Imagen is simpler than Google's DALL-E2, but better. It is the new SOTA for text-to-image synthesis.
 
-<a href="https://www.youtube.com/watch?v=xqDeAz0U-R4">AI Coffee Break with Letitia</a> | <a href="https://www.assemblyai.com/blog/how-imagen-actually-works/">Assembly AI</a>
+In the next image, some outputs of Imagen are showed.
 
-Please join <a href="https://discord.gg/xBPBXfcFHd"><img alt="Join us on Discord" src="https://img.shields.io/discord/823813159592001537?color=5865F2&logo=discord&logoColor=white"></a> if you are interested in helping out with the replication with the <a href="https://laion.ai/">LAION</a> community
-
-## Shoutouts
-
-- <a href="https://stability.ai/">StabilityAI</a> for the generous sponsorship, as well as my other sponsors out there
-
-- <a href="https://huggingface.co/">🤗 Huggingface</a> for their amazing transformers library. The text encoder portion is pretty much taken care of because of them
-
-- <a href="https://github.com/sgugger">Sylvain</a> and <a href="https://github.com/muellerzr">Zachary</a> for the <a href="https://github.com/huggingface/accelerate">Accelerate</a> library, which this repository uses for distributed training
-
-- <a href="https://github.com/jorgemcgomes">Jorge Gomes</a> for helping out with the T5 loading code and advice on the correct T5 version
-
-- <a href="https://github.com/crowsonkb">Katherine Crowson</a>, for her <a href="https://github.com/crowsonkb/v-diffusion-jax/blob/master/diffusion/utils.py">beautiful code</a>, which helped me understand the continuous time version of gaussian diffusion
-
-- <a href="https://github.com/marunine">Marunine</a> and <a href="https://github.com/Netruk44">Netruk44</a>, for reviewing code, sharing experimental results, and help with debugging
-
-- <a href="https://github.com/marunine">Marunine</a> for providing a <a href="https://github.com/lucidrains/imagen-pytorch/issues/72#issuecomment-1163275757">potential solution</a> for a color shifting issue in the memory efficient u-nets. Thanks to <a href="https://github.com/jacobwjs">Jacob</a> for sharing experimental comparisons between the base and memory-efficient unets
-
-- <a href="https://github.com/marunine">Marunine</a> for finding numerous bugs, resolving an issue with resize right, and for sharing his experimental configurations and results
-
-- <a href="https://github.com/MalumaDev">MalumaDev</a> for proposing the use of pixel shuffle upsampler to fix checkboard artifacts
-
-- <a href="https://github.com/KhrulkovV">Valentin</a> for pointing out insufficient skip connections in the unet, as well as the specific method of attention conditioning in the base-unet in the appendix
-
-- <a href="https://github.com/BIGJUN777">BIGJUN</a> for catching a big bug with continuous time gaussian diffusion noise level conditioning at inference time
+<img src="./imagen_examples.png" width="450px"></img>
 
 ## Install
 
+Use this command to clone the repository for use in Google Colab
+
 ```bash
-$ pip install imagen-pytorch
+! git clone https://github.com/GuiSilvaPA/TextToImage.git
+
+import sys
+sys.path.insert(0,'/content/TextToImage/Imagen')
 ```
 
 ## Usage
