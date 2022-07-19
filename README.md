@@ -2,13 +2,18 @@
 
 This work is based on Imagen, a Text to Image generator. The main difference between this implementation and the original is the UNets cascade, which is not present in this work. The template created here is similar to the image below
 
-<img src="./imagen.png" width="450px"></img>
+<p align="center">
+    <img src="./imagen.png" width="500px"></img>
+</p>
 
 The implementation of the original image is presented in <a href="https://gweb-research-imagen.appspot.com/">Imagen</a>. the architecture of Imagen is simpler than Google's DALL-E2, but better. It is the new SOTA for text-to-image synthesis.
 
 In the next image, some outputs of Imagen are showed.
 
-<img src="./imagen_examples.png" width="450px"></img>
+
+<p align="center">
+    <img src="./imagen_examples.png" width="600px"></img>
+</p>
 
 ## Install
 
