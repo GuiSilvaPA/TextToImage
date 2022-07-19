@@ -2,6 +2,8 @@
 
 <a href="https://colab.research.google.com/drive/1CXsdGN7JuN-JZ9nvq6_fbkealSJ3dQuN?usp=sharing">Test with Small MS COCO and image size of 128x128</a>
 
+p
+
 ## Imagen - Pytorch
 
 This work is based on Imagen, a Text to Image generator. The main difference between this implementation and the original is the UNets cascade, which is not present in this work. The template created here is similar to the image below
