@@ -313,19 +313,15 @@ class UNet(nn.Module):
 ################ Funil for High Resolution ###########################################################
 ######################################################################################################
 
-class TripleConv(nn.Module):
+class DoubleConv(nn.Module):
     def __init__(self, in_channels, out_channels):
-        super(TripleConv, self).__init__()
+        super(DoubleConv, self).__init__()
         
         self.conv = nn.Sequential(        
             nn.Conv2d(in_channels, out_channels, 3, 1, 1, bias=False),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
             
-            nn.Conv2d(out_channels, out_channels, 3, 1, 1, bias=False),
-            nn.BatchNorm2d(out_channels),
-            nn.ReLU(inplace=True),
-
             nn.Conv2d(out_channels, out_channels, 3, 1, 1, bias=False),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True))
@@ -341,7 +337,7 @@ class HighResolution(nn.Module):
 
         for f in range(len(features)-1):
             self.ups.append(nn.ConvTranspose2d(features[f], features[f+1], kernel_size=2, stride=2))
-            self.ups.append(TripleConv(features[f+1], features[f+1]))
+            self.ups.append(DoubleConv(features[f+1], features[f+1]))
 
         self.final_conv = nn.Conv2d(features[-1], features[0], kernel_size=1)
         
