@@ -208,7 +208,7 @@ class HighResolutionTrainer(nn.Module):
     def __init__(self, high_model, epochs = 5, lr = 1e-4, device='cpu'):
         super(HighResolutionTrainer, self).__init__()
 
-        self.high_model = high_model
+        self.high_model = high_model.to(device)
         self.device     = device
         self.optimizer  = SGD(high_model.parameters(), lr=lr, weight_decay=0.0)
         self.criterion  = nn.L1Loss().to(device)
@@ -219,7 +219,7 @@ class HighResolutionTrainer(nn.Module):
         path = Path(path)
         path.parent.mkdir(parents=True, exist_ok=True)
 
-        torch.save(self.imagen.state_dict(), str(path))
+        torch.save(self.high_model.state_dict(), str(path))
 
     @torch.no_grad()
     def validation_loss(self, data):
