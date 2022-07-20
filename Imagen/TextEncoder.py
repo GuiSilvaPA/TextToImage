@@ -33,8 +33,11 @@ if __name__=='__main__':
     print('\n\n==============================================================================\n\n')
     print(T5.textEncoder(['I', 'you', 'yes my'])[0].shape)
     print()
+    print(T5.textEncoder(['I', 'yes my'])[0].shape)
+    print()
     print(T5.textEncoder(['I', 'you', 'yes my'])[0])
     print()
     print(T5.textEncoder(['I', 'you', 'yes my'])[1])
+    print('\nDimension:', T5.embed_dim)
 
-    print('Dimension:', T5.embed_dim)
+    
