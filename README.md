@@ -1,16 +1,22 @@
 ## Tests
 
-:heart_eyes: :heavy_check_mark: <a href="https://colab.research.google.com/drive/15K9EdVJ_XiJ1HlvKApqio-UQ85_UX2Wa?usp=sharing">Training with Small MS COCO and image size of 64x64, using old UNet model</a>
+:heart_eyes: :heavy_check_mark: <a href="https://colab.research.google.com/drive/1IoSlyF9Gx3c3xKunocV6fpAMGl7e3sx0?usp=sharing">Final Evaluating with Small MS COCO and image size of 64x64, using old UNet model</a>
 
-:rage: :heavy_multiplication_x: <a href="https://colab.research.google.com/drive/1CXsdGN7JuN-JZ9nvq6_fbkealSJ3dQuN?usp=sharing">Training with Small MS COCO and image size of 128x128</a>
+:heart_eyes: :heavy_check_mark: <a href="https://colab.research.google.com/drive/15K9EdVJ_XiJ1HlvKApqio-UQ85_UX2Wa?usp=sharing">Final Training with Small MS COCO and image size of 64x64, using old UNet model</a>
 
-:rage: :heavy_multiplication_x: <a href="https://colab.research.google.com/drive/1_0dDEMMmzBDhrMpughXUP58JBh8Yp4I8?usp=sharing">Training with Small MS COCO and image size of 96x96</a>
+:heart_eyes: :heavy_check_mark: <a href="https://colab.research.google.com/drive/1MWSEhyKA2olh-pu8y7WZELDeAjdjPMwb?usp=sharing">First Training with Small MS COCO and image size of 64x64, using old UNet model</a>
 
-:rage: :heavy_multiplication_x: <a href="https://colab.research.google.com/drive/1r_G1TV0T0TPiRh-o9l4wipZS78fkGyxT?usp=sharing">Training with Small MS COCO and image size of 64x64</a>
+:heart_eyes: :heavy_check_mark: <a href="https://colab.research.google.com/drive/129tcG9Ik7JbcA1ePHhfuVYxJIrDMqjfj?usp=sharing">Overfitting with Small MS COCO and image size of 64x64, using old UNet model</a>
 
-:rage: :heavy_multiplication_x: <a href="https://colab.research.google.com/drive/1Nu_qoCrCH9jnHoQxvP5FA-9ddGt2agBf?usp=sharing">Training with Fashion MNIST and image size of 28x28</a>
+:heart_eyes: :heavy_check_mark: <a href="https://colab.research.google.com/drive/1NCG6JUjbxiUMzCxZgmMrIkIKCTEdps1q?usp=sharing">Training with Fashion MNIST and image size of 28x28, using old UNet model</a>
 
-:heart_eyes: :heavy_check_mark: <a href="https://colab.research.google.com/drive/129tcG9Ik7JbcA1ePHhfuVYxJIrDMqjfj?usp=sharing">Overfitting with Small MS COCO and image size of 64x64</a>
+:rage: :heavy_multiplication_x: <a href="https://colab.research.google.com/drive/1CXsdGN7JuN-JZ9nvq6_fbkealSJ3dQuN?usp=sharing">Training with Small MS COCO and image size of 128x128, using new UNet model</a>
+
+:rage: :heavy_multiplication_x: <a href="https://colab.research.google.com/drive/1_0dDEMMmzBDhrMpughXUP58JBh8Yp4I8?usp=sharing">Training with Small MS COCO and image size of 96x96, using new UNet model</a>
+
+:rage: :heavy_multiplication_x: <a href="https://colab.research.google.com/drive/1r_G1TV0T0TPiRh-o9l4wipZS78fkGyxT?usp=sharing">Training with Small MS COCO and image size of 64x64, using new UNet model</a>
+
+:rage: :heavy_multiplication_x: <a href="https://colab.research.google.com/drive/1Nu_qoCrCH9jnHoQxvP5FA-9ddGt2agBf?usp=sharing">Training with Fashion MNIST and image size of 28x28, using new UNet model</a>
 
 
 ## Imagen - Pytorch
