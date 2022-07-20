@@ -106,14 +106,12 @@ class TextConditioning(nn.Module):
 class UNet(nn.Module):
     def __init__(self, dim, text_embed_dim = TextEncoderT5Based().embed_dim, num_resnet_blocks = 1,
                  cond_dim = None, num_time_tokens = 2, learned_sinu_pos_emb_dim = 16, dim_mults=(1, 2, 4, 8),
-                 channels = 3, att_dim_head = 64, att_heads = 8, ff_mult = 2, lowres_cond = False, 
+                 channels = 3, att_dim_head = 64, att_heads = 8, ff_mult = 2, 
                  layer_attns = True, layer_cross_attns = True, max_text_len = 256, resnet_groups = 8,
                  init_cross_embed_kernel_sizes = (3, 7, 15), att_pool_num_latents = 32,
                  use_global_context_attn = True, device='cpu'):
 
         self.device = device
-
-        self.lowres_cond = lowres_cond
 
         super(UNet, self).__init__()
         
@@ -235,17 +233,6 @@ class UNet(nn.Module):
         self.final_resnet = BM.ResnetLayer(dim, dim, time_cond_dim=dim*4, groups=resnet_groups[0], linear_att=False, gca=True)
         self.final_conv   = nn.Conv2d(dim, channels, 3, padding=1)
 
-    ##################################################################################################################
-    ##################################################################################################################
-    ##################################################################################################################
-    ##################################################################################################################
-    ##################################################################################################################
-
-    def lowres_change(self, lowres_cond):
-    
-        if lowres_cond == self.lowres_cond:
-            return self
-        return self.__class__(**{**self._locals, **dict(lowres_cond = lowres_cond)})
 
     def forward_with_cond_scale(self, *args, cond_scale = 1., **kwargs):
     
@@ -254,15 +241,8 @@ class UNet(nn.Module):
             return logits
         null_logits = self.forward(*args, cond_drop_prob = 1., **kwargs)
         return null_logits + (logits - null_logits) * cond_scale
-
-    ##################################################################################################################
-    ##################################################################################################################
-    ##################################################################################################################
-    ##################################################################################################################
-    ##################################################################################################################
         
-    def forward(self, x, time, text_embeds, text_mask,
-                cond_images=None, lowres_cond_img = None, lowres_noise_times = None, cond_drop_prob = 0.):
+    def forward(self, x, time, text_embeds, text_mask):
         
         x           = x.to(self.device)
         time        = time.to(self.device)
@@ -327,6 +307,5 @@ class UNet(nn.Module):
         x = self.final_resnet(x)
         x = self.final_conv(x)
         
-        # return x, c, t
         return x
         
