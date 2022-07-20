@@ -45,8 +45,10 @@ sys.path.insert(0,'/content/TextToImage/Imagen')
 
 ### UNet
 
+Don't use `from ComplexModels import UNet` this version will be fixed
+
 ```python
-from ComplexModels import UNet
+from OldComplexModels import UNet
 
 # dim: number base for channels in each convolutional layer
 # dim_mults: multplier for each concolutional layer
