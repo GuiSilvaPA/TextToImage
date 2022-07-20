@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from torch.optim import Adam
+from torch.optim import Adam, SGD
 from torch.utils.data import Dataset
 from torchvision import transforms
 
@@ -13,7 +13,8 @@ from tqdm.notebook import tqdm
 
 import numpy as np
 from scipy.linalg import sqrtm
-from torchvision.models import resnet50, ResNet50_Weights
+from skimage.transform import resize
+from keras.applications.inception_v3 import InceptionV3
 
 # =============================================================================================
 # === COLLATE ANY FUNCTION ====================================================================
@@ -61,12 +62,41 @@ class CustomDataset(Dataset):
             self.images.close()
 
 # =============================================================================================
+# === CLASS FOR DATASET OF HIGH RESOLUTION ====================================================
+# =============================================================================================
+
+class HighResolutionCustomDataset(Dataset):
+    def __init__(self, img_file, target_file, image_size=64):
+
+        self.captions = json.load(open(target_file, "r"))
+
+        self.img_file      = img_file
+        self.images        = None
+        self.img_transform = transforms.Resize(image_size)
+
+    def __len__(self):
+        return len(self.captions)
+    
+    def __getitem__(self, idx):
+    
+        if not self.images: self.images = h5py.File(self.img_file, 'r') 
+            
+        img = self.images["images"][idx].astype(float)
+        img = torch.from_numpy((img - img.min()) / np.max([img.max() - img.min(), 1]))     
+                
+        return self.img_transform(img), img
+
+    def __del__(self):
+        if self.images:
+            self.images.close()
+
+# =============================================================================================
 # === CLASS FOR TRAIN THE MODEL ===============================================================
 # =============================================================================================
 
 class ImagenTrainer(nn.Module):
 
-    def __init__(self, imagen, epochs = 10, first_epoch=1, p=1, lr = 1e-4, eps = 1e-8,
+    def __init__(self, imagen, high_model = None, epochs = 10, first_epoch=1, p=1, lr = 1e-4, eps = 1e-8,
                  beta1 = 0.9, beta2 = 0.99, device='cpu'):
 
         super(ImagenTrainer, self).__init__()
@@ -78,6 +108,7 @@ class ImagenTrainer(nn.Module):
         self.first_epoch = first_epoch
         self.optimizer   = Adam(self.unet.parameters(), lr=lr, eps=eps, betas=(beta1, beta2))
         self.epochs      = epochs
+        self.high_model  = high_model
 
     def save(self, path):
 
@@ -91,10 +122,19 @@ class ImagenTrainer(nn.Module):
         path = Path(path)
         self.imagen.load_state_dict(torch.load(str(path)))
 
+    def load_high(self, path):
+
+        path = Path(path)
+        self.imagen.load_state_dict(torch.load(str(path)))
+
     @torch.no_grad()
-    def sample(self, texts, cond_scale):
+    def sample(self, texts, cond_scale, use_high_resolution = False):
         
         output = self.imagen.sample(texts=texts, cond_scale=cond_scale)
+
+        if use_high_resolution:
+            output = self.high_model(output)
+
         return output
 
     @torch.no_grad()
@@ -160,28 +200,28 @@ class ImagenTrainer(nn.Module):
         plt.show()
 
 # =============================================================================================
+# === HIGH RESOLUTION TRAINER =================================================================
+# =============================================================================================
+
+# =============================================================================================
 # === FID METRIC ==============================================================================
 # =============================================================================================
 
-class Identity(nn.Module):
-    def __init__(self):
-        super(Identity, self).__init__()
-        
-    def forward(self, x):
-        return x
-
+def scale_images(images, new_shape):
+    return np.asarray([resize(image, new_shape, 0) for image in images])
+ 
 def FID(image, target_image, device='cpu'):
     
     # Based on: https://arxiv.org/pdf/1706.08500.pdf
     # FID = ||Mr - Mg||^2 + Trace(COVr + COVg + 2*(COVr*COVg)**(1/2))
 
-    model    = resnet50(weights=ResNet50_Weights.IMAGENET1K_V1)
-    model.fc = Identity()
+    model        = InceptionV3(include_top=False, pooling='avg', input_shape=(299,299,3))
 
-    model = model.to(device)
+    image        = scale_images(image.cpu().numpy().transpose(0, 2, 3, 1), (299, 299))
+    target_image = scale_images(target_image.cpu().numpy().transpose(0, 2, 3, 1), (299, 299))
 
-    IMGg = model(image).detach().numpy()
-    IMGr = model(target_image).detach().numpy() 
+    IMGg = model.predict(image)
+    IMGr = model.predict(target_image)
         
     Mg, COVg = IMGg.mean(axis=0), np.cov(IMGg, rowvar=False)
     Mr, COVr = IMGr.mean(axis=0), np.cov(IMGr, rowvar=False)
@@ -196,14 +236,14 @@ def FID(image, target_image, device='cpu'):
 # === GET SEQUENCE OF IMAGES ==================================================================
 # =============================================================================================
 
-def get_images(trainer, loader):
+def get_images(trainer, loader, num_imgs):
 
     imgs, texts = [], []
 
     for m, (i, t) in enumerate(loader):
         imgs.append(i[0])
         texts.append(t[0])
-        if m+1 == 50: break
+        if m+1 == num_imgs: break
 
     images_out = trainer.sample(texts=texts, cond_scale = 3.)
 
@@ -229,7 +269,3 @@ def get_images(trainer, loader):
         print('\n=========================================================================== \n')
 
     return images_out, imgs, texts
-
-if __name__ == '__main__':
-
-    pass
