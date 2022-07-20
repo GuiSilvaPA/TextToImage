@@ -203,6 +203,86 @@ class ImagenTrainer(nn.Module):
 # === HIGH RESOLUTION TRAINER =================================================================
 # =============================================================================================
 
+class HighResolutionTrainer(nn.Module):
+
+    def __init__(self, high_model, epochs = 5, lr = 1e-4, device='cpu'):
+        super(HighResolutionTrainer, self).__init__()
+
+        self.high_model = high_model
+        self.device     = device
+        self.optimizer  = SGD(high_model.parameters(), lr=lr, weight_decay=0.0)
+        self.criterion  = nn.L1Loss().to(device)
+        self.epochs     = epochs        
+
+    def save(self, path):
+
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+
+        torch.save(self.imagen.state_dict(), str(path))
+
+    @torch.no_grad()
+    def validation_loss(self, data):
+
+        total_loss = 0.
+
+        for images, high_images in tqdm(data):
+
+                images      = images.to(self.device).float()
+                high_images = high_images.to(self.device).float()
+
+                outputs = self.high_model(images)
+                loss    = self.criterion(outputs.float(), high_images.float())
+
+                total_loss += loss.item()*high_images.size(0)
+
+        return total_loss/len(data)
+
+    def forward(self, train_data, valid_data, path=None):
+
+        train_loss_per_epoch, valid_loss_per_epoch = [], []
+
+        for epoch in tqdm(range(1, self.epochs+1)):
+
+            train_loss = 0.0
+            self.high_model.train()
+
+            print(f'\n================================ EPOCH {epoch} ================================\n')
+
+            for images, high_images in tqdm(train_data):
+
+                images      = images.to(self.device).float()
+                high_images = high_images.to(self.device).float()
+
+                self.optimizer.zero_grad()  
+                
+                # Forward
+                outputs = self.high_model(images)
+                loss    = self.criterion(outputs.float(), high_images.float())
+
+                #Backward
+                
+                loss.backward()
+                self.optimizer.step()
+                train_loss += loss.item()*high_images.size(0)
+
+            total_train_loss = train_loss/len(train_data)
+            total_valid_loss = self.validation_loss(valid_data)
+
+            train_loss_per_epoch.append(total_train_loss)
+            valid_loss_per_epoch.append(total_valid_loss)
+
+            if path is not None:
+                if total_valid_loss <= total_train_loss:
+                    self.save(path)
+
+            print(f'\nEpoch: {epoch} | Train Loss: {total_train_loss} | Valid Loss: {total_valid_loss}')
+
+        plt.plot(train_loss_per_epoch, label="Training")
+        plt.plot(valid_loss_per_epoch, label="Validating")
+        plt.title('Loss x Epoch')
+        plt.show()
+
 # =============================================================================================
 # === FID METRIC ==============================================================================
 # =============================================================================================
